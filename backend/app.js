@@ -53,7 +53,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 //enregistrement des routes
 //app.use("/api/messages", messageRoutes); // L'application utilise le endpoint /api/messages pour les routes messageRoutes
 //app.use("/api/comments", commentRoutes); // L'application utilise le endpoint /api/comments pour les routes commentRoutes
-//app.use("/api/auth", userRoutes); // L'application utilise le endpoint /api/auth pour les routes userRoutes
+app.use("/api/auth", userRoutes); // L'application utilise le endpoint /api/auth pour les routes userRoutes
 
 //exporter cette application pour y accéder depuis les autres fichiers notamment le serveur
 module.exports = app;
