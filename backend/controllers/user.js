@@ -8,29 +8,30 @@ const Utils = require('../libs/utils.js');
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10) // On appelle la fonction de hachage du mot passe avec 10 tours d'algorithmes de hachage
         .then(hash => {
-            const user = new User({
+            const User = new User({
                 pseudo: req.body.pseudo,
                 email: req.body.email,
                 password: hash,
                 isActive: true,
             });
-            user.save()
+            User.save()
                 .then(() => res.status(201).json({ message: 'Utilisateur créé !' })) // Création utilisateur, requête réussie et ressource créée code 201 OK
                 .catch(error => res.status(400).send('Utilisateur déjà existant !')); // Erreur 400 Utilisateur déjà existant
 
         })
-        .catch(error => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
+
+    .catch(error => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
 };
 
 // Connexion
 exports.login = (req, res, next) => {
     User.findOneByEmail(req.body.email, (err, result) => {
         if (err) {
-            return res.status(400).send({ message: 'Utilisateur non trouvé' }); //Erreur adresse mail introuvable code 400
+            return res.status(400).send({ message: 'Utilisateur non trouvé' }); //Erreur utilisateur introuvable code 400
         }
 
         if (!result.isActive) {
-            return res.status(400).send({ message: 'Utlisateur trouvé mais désactivé' });
+            return res.status(400).send({ message: 'Utlisateur trouvé mais désactivé' }); //Erreur utilisateur désactivé
         }
 
         bcrypt.compare(req.body.password, result.password)
@@ -69,7 +70,7 @@ exports.getAllUsers = (req, res, next) => {
         if (err) {
             return res.status(404).send({ message: 'Utilisateurs non trouvés' });
         } else {
-            res.status(200).json(result, { message: 'Tous les utilisateurs ont été trouvés!' })
+            res.status(200).json(result)
         }
     })
 };
@@ -81,7 +82,7 @@ exports.getOneUser = (req, res, next) => {
         if (err) {
             return res.status(404).send({ message: 'Utilisateur non trouvé' });
         } else {
-            res.status(200).json(result, { message: 'L\'utilisateur a été trouvé!' })
+            res.status(200).json(result)
         }
     })
 };
