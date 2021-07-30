@@ -14,8 +14,8 @@ const User = function(user) {
 // Création d'un user
 User.create = (newUser, result) => {
     db.query(`INSERT 
-              INTO users 
-              SET ?`,
+    INTO users 
+    SET ?`,
         newUser, (err, res) => {
             if (err) {
                 result(err, null);
@@ -32,9 +32,9 @@ User.create = (newUser, result) => {
 // Trouver un user via son email
 User.findOneByEmail = (email, result) => {
     db.query(`SELECT * 
-              FROM users 
-              WHERE email=?
-              AND isActive=true`,
+     FROM users 
+     WHERE email=?
+    AND isActive=true`,
         email, (err, res) => {
             if (err) {
                 result(err, null);
@@ -47,9 +47,9 @@ User.findOneByEmail = (email, result) => {
 // Trouver un user via son id
 User.findOneById = (id, result) => {
     db.query(`SELECT * 
-              FROM users 
-              WHERE id=?
-              AND isActive=true`,
+    FROM users 
+    WHERE id=?
+    AND isActive=true`,
         id, (err, res) => {
             if (err) {
                 result(err, null);
@@ -62,8 +62,8 @@ User.findOneById = (id, result) => {
 // Trouver tous les users dans la BDD
 User.findAll = (result) => {
     db.query(`SELECT * 
-              FROM users
-              WHERE isActive=true`,
+     FROM users
+      WHERE isActive=true`,
         (err, res) => {
             if (err) {
                 result(err, null);
@@ -76,38 +76,40 @@ User.findAll = (result) => {
 // Modifier un user
 User.modifyPseudo = (user, result) => {
     db.query(`UPDATE users 
-              SET pseudo=? 
-              WHERE id=?
-              AND isActive=true`, [user.pseudo, user.id], (err, res) => {
-        if (err) {
-            result(err, null);
-            return;
-        } else {
-            result(null, res)
-        }
-    })
+      SET pseudo=? 
+      WHERE id=?
+     AND isActive=true`, [user.pseudo, user.id],
+        (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            } else {
+                result(null, res)
+            }
+        })
 };
 
 // Modifier un user
 User.modifyProfilPic = (user, result) => {
     db.query(`UPDATE users 
-              SET profilPic=? 
-              WHERE id=?
-              AND isActive=true`, [user.profilPic, user.id], (err, res) => {
-        if (err) {
-            result(err, null);
-            return;
-        } else {
-            result(null, res)
-        }
-    })
+      SET profilPic=? 
+     WHERE id=?
+     AND isActive=true`, [user.profilPic, user.id],
+        (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            } else {
+                result(null, res)
+            }
+        })
 };
 
 // Supprimer un user
 User.deactivate = (id, result) => {
     db.query(`UPDATE users
-              SET isActive=false
-              WHERE id=?`,
+    SET isActive=false
+    WHERE id=?`,
         id, (err, res) => {
             if (err) {
                 result(err, null);
