@@ -34,7 +34,7 @@ CREATE TABLE users (
 ) 
 ENGINE=InnoDB;
 
-INSERT INTO users VALUES (1,'FranckF5683','silver56@orange.fr',' Zedrftg12,','Franck.jpg', 1, 1);
+INSERT INTO users VALUES (1,'FranckF5683','silver56@orange.fr',' Zedrftg12,','FranckF5683.jpg', 1, 1);
 
 
 
