@@ -18,7 +18,7 @@ const rateLimit = require('express-rate-limit');
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes 
-    max: 15 // 15 essais max
+    max: 30 // 15 essais max
 });
 
 //Importation de CORS
@@ -51,8 +51,8 @@ app.use(cors());
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 //enregistrement des routes
-//app.use("/api/messages", messageRoutes); // L'application utilise le endpoint /api/messages pour les routes messageRoutes
-//app.use("/api/comments", commentRoutes); // L'application utilise le endpoint /api/comments pour les routes commentRoutes
+app.use("/api/messages", messageRoutes); // L'application utilise le endpoint /api/messages pour les routes messageRoutes
+app.use("/api/comments", commentRoutes); // L'application utilise le endpoint /api/comments pour les routes commentRoutes
 app.use("/api/auth", userRoutes); // L'application utilise le endpoint /api/auth pour les routes userRoutes
 
 //exporter cette application pour y accéder depuis les autres fichiers notamment le serveur
