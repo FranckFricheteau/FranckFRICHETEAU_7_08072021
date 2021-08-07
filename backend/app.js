@@ -21,7 +21,7 @@ const rateLimit = require('express-rate-limit');
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes 
-    max: 30 // 15 essais max
+    max: 15 // 15 essais max
 });
 
 //Importation de CORS
