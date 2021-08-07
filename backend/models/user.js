@@ -1,4 +1,5 @@
 // Création des modèles User
+var mysql = require('mysql');
 const db = require('./db');
 const Utils = require('../libs/utils');
 
