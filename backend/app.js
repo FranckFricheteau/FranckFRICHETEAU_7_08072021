@@ -46,7 +46,7 @@ connection.connect(function(error) {
     if (error) {
         console.log("connection to MySQL failed");
         throw error
-    } else { console.log('All is under controle =) Success ! '); }
+    } else { console.log('All is under controle =) connection to MySQL success ! '); }
 });
 
 
