@@ -1,10 +1,10 @@
-const db = require('../models/db');
+var mysql = require('mysql');
 const User = require('../models/user'); // Importation modèle User
 const jwt = require('jsonwebtoken'); // Importation du package jsonwebtoken. Il permet l'échange sécurisé de jetons (tokens) entre plusieurs parties
 
 const bcrypt = require('bcrypt'); // Importation du package de chiffrement bcrytp
 const fs = require('fs'); // Importation file system de node.js
-//const Utils = require('../libs/utils');
+const Utils = require('../libs/utils');
 
 
 // Inscription pour enregistrer des nouveaux utilisateurs
@@ -14,18 +14,18 @@ exports.signup = (req, res, next) => {
             const user = new User({
                 pseudo: req.body.pseudo,
                 email: req.body.email,
-                password: hash,
-                isActive: true
-            })
-            User.create(user, (err) => {
+                password: hash
+                    //isActive: true
+            });
+            User.create(user, (err, result) => {
                 if (err) {
                     return res.status(400).send({ message: 'Impossible de créer l\'utilisateur' });
                 } else {
-                    res.status(200).json({ message: 'utilisateur créé!' });
+                    res.status(200).json(result)
                 }
             })
         })
-        .catch(err => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
+        .catch(error => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
 };
 
 // Connexion
