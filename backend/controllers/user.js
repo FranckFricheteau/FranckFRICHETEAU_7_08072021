@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken'); // Importation du package jsonwebtoken. Il 
 
 const bcrypt = require('bcrypt'); // Importation du package de chiffrement bcrytp
 const fs = require('fs'); // Importation file system de node.js
-const Utils = require('../libs/utils');
+//const Utils = require('../libs/utils');
 
 
 // Inscription pour enregistrer des nouveaux utilisateurs
@@ -19,7 +19,9 @@ exports.signup = (req, res, next) => {
             })
             User.create(user, (err) => {
                 if (err) {
-                    return res.status(400).json({ message: 'Impossible de créer l\'utilisateur' });
+                    return res.status(400).send({ message: 'Impossible de créer l\'utilisateur' });
+                } else {
+                    res.status(200).json({ message: 'utilisateur créé!' });
                 }
             })
         })
