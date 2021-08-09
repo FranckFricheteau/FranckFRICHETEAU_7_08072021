@@ -11,6 +11,8 @@ const Users = function(user) {
         this.isAdmin = !!user.isAdmin,
         this.isActive = !!user.isActive
 
+
+
     // Création d'un user
     Users.create = (newUser, result) => {
         let statment = 'INSERT INTO users SET ?';
@@ -30,7 +32,7 @@ const Users = function(user) {
     // Trouver un user via son email
     Users.findOne = (email, result) => {
         let statment = 'SELECT * FROM users WHERE email=? AND isActive=true';
-        db.query('SELECT * FROM users WHERE email=? AND isActive=true', email, (err, res) => {
+        db.query(statment, email, (err, res) => {
             if (err) {
                 result(err, null);
                 return;
