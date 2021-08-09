@@ -1,48 +1,41 @@
-var mysql = require('mysql');
-const User = require('../models/user'); // Importation modèle User
-const jwt = require('jsonwebtoken'); // Importation du package jsonwebtoken. Il permet l'échange sécurisé de jetons (tokens) entre plusieurs parties
-
-const bcrypt = require('bcrypt'); // Importation du package de chiffrement bcrytp
-const fs = require('fs'); // Importation file system de node.js
-const Utils = require('../libs/utils');
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Users = require('../models/user');
 
 // Inscription pour enregistrer des nouveaux utilisateurs
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10) // On appelle la fonction de hachage, on créer un nouvel utilisateur, on le sauvegarde dans la BDD
         .then(hash => {
-            const user = new User({
+            const user = {
                 pseudo: req.body.pseudo,
                 email: req.body.email,
-                password: hash
-                    //isActive: true
-            });
-            User.create(user, (err, result) => {
-                if (err) {
-                    return res.status(400).send({ message: 'Impossible de créer l\'utilisateur' });
-                } else {
-                    res.status(200).json(result)
-                }
-            })
+                password: hash,
+                isActive: true,
+                isAdmin: 0
+            };
+            console.log(user);
+            Users.create(user)
+                .then(() => res.status(201).json({ message: 'Utilisateur créé !' })) // Création utilisateur, requête réussie et ressource créée code 201 OK
+                .catch(error => res.status(400).send('Utilisateur déjà existant !')); // Erreur 400 Utilisateur déjà existant
         })
         .catch(error => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
 };
 
 // Connexion
+// controller de connexion à un compte existant
 exports.login = (req, res, next) => {
-    User.findOneByEmail(req.body.email, (err, result) => {
+    Users.findOne({ email: req.body.email }, (err, result) => {
         if (err) {
             return res.status(400).json({ message: 'Utilisateur non trouvé' });
         }
 
         if (!result.isActive) {
-            return res.status(400).send({ message: 'Utlisateur trouvé mais désactivé' }); //Erreur utilisateur désactivé
+            return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
         }
-
         bcrypt.compare(req.body.password, result.password)
             .then(valid => {
                 if (!valid) {
-                    return res.status(401).send({ message: 'Mot de passe invalide, veuillez réessayer s\'il vous plaît' }) //Erreur mot de passe invalide code 400
+                    return res.status(401).json({ message: 'Mot de passe invalide' })
                 } else {
                     let payload = {
                         'userId': result.id,
@@ -69,9 +62,10 @@ exports.login = (req, res, next) => {
     })
 };
 
+
 // Récupérer tous les utilisateurs
 exports.getAllUsers = (req, res, next) => {
-    User.findAll((err, result) => {
+    Users.findAll((err, result) => {
         if (err) {
             return res.status(404).send({ message: 'Utilisateurs non trouvés' });
         } else {
@@ -83,7 +77,7 @@ exports.getAllUsers = (req, res, next) => {
 // Réupérer un seul user
 exports.getOneUser = (req, res, next) => {
     let id = req.body.userId
-    User.findOneById(id, (err, result) => {
+    Users.findOneById(id, (err, result) => {
         if (err) {
             return res.status(404).send({ message: 'Utilisateur non trouvé' });
         } else {
@@ -103,7 +97,7 @@ exports.updateOneUserPseudo = (req, res, next) => {
         'id': req.params.id,
         'pseudo': req.body.pseudo,
     }
-    User.modifyPseudo(user, (err, result) => {
+    Users.modifyPseudo(user, (err, result) => {
         if (err) {
             return res.status(400).send({ message: 'Modification non effectuée' });
         }
@@ -125,7 +119,7 @@ exports.updateOneUserFile = (req, res, next) => {
         'id': req.params.id,
         'profilPic': req.file ? req.file.filename : null,
     }
-    User.modifyProfilPic(user, (err, result) => {
+    Users.modifyProfilPic(user, (err, result) => {
         if (err) {
             return res.status(400).send({ message: 'BACK Modification non effectuée' });
         }
@@ -137,7 +131,7 @@ exports.updateOneUserFile = (req, res, next) => {
 
 // Supprimer un user
 exports.deactivateUser = (req, res, next) => {
-    User.deactivate(req.params.id, (err, result) => {
+    Users.deactivate(req.params.id, (err, result) => {
         if (err) {
             return res.status(400).send({ message: 'Impossible de supprimer l\'utilisateur' });
         }
