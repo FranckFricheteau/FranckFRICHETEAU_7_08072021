@@ -1,54 +1,34 @@
-//framework standard pour le développement de serveur en Node.js
 const express = require('express');
-
-//Importation de mysql
-var mysql = require('mysql');
-
-//pour accéder au path de notre serveur
-const path = require('path');
-
-//Importation d'helmet, aide à sécuriser l'application Express, Middleware style Connect compatible avec le framework Express
-const helmet = require("helmet");
-
-//pour créer une application express
 const app = express();
+const path = require("path")
+const bodyParser = require('body-parser');
+const auth = require("./middleware/auth")
 
-//Installation d'helmet, entête HTTP helmet
-app.use(helmet());
+// recuperation de Helmet (sécurise les appli Express en définissant divers en-têtes HTTPP, protège contre les failles XSS//
+const helmet = require('helmet');
+const cors = require('cors');
 
 //Rate Limit - Middleware de base à limitation de débit pour Express
 const rateLimit = require('express-rate-limit');
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes 
-    max: 15 // 15 essais max
+    max: 30 // 15 essais max
 });
-
-//Importation de CORS
-//const cors = require('cors');
 
 //Limiter les demandes répétées à l'API uniquement sur le login
 app.use("/api/auth/login", apiLimiter);
 
-const messageRoutes = require("./routes/messages"); // Importation des routes messages
-const commentRoutes = require("./routes/comments"); // Importation des routes comments
-const userRoutes = require("./routes/user"); // Importation des routes user
 
-var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Azerty123,',
-    database: 'groupomania',
-});
+//import des routeurs dans l'application
+const authRoutes = require("./routes/auth") // Importation de la route auth
+const userRoutes = require("./routes/user") // Importation de la route user
+const messageRoutes = require("./routes/messages") // Importation de la route messages
+const commentRoutes = require("./routes/comments") // Importation de la route comments
 
-//Connexion a mysql
-connection.connect(function(error) {
-    if (error) {
-        console.log("connection to MySQL failed");
-        throw error
-    } else { console.log('All is under controle =) connection to MySQL success ! '); }
-});
 
+//DB connection//
+require("./models/db");
 
 //CORS - Cross Origin Ressources Sharing - Partage des ressources entre origines multiples - Ajout d'entêtes HTTP pour accéder aux ressources d'un serveur situées sur une autre origine que le site courant provenant d'un domaine, port et protocole différent
 app.use((req, res, next) => {
@@ -58,20 +38,26 @@ app.use((req, res, next) => {
     next();
 });
 
+/* .json - méthode de l'objet bodyParser qui transforme le corps de la requête en objet JS*/
+app.use(bodyParser.json());
+
+//Installation d'helmet, entête HTTP helmet
+app.use(helmet());
+//Installation de CORS - Utilisation de CORS
+app.use(cors());
+
 //Installation d'express - Utiliser l'application Express
 app.use(express.json());
-
-//Installation de CORS - Utilisation de CORS
-//app.use(cors());
 
 //gestionnaire de routage pour les images
 //__dirname: le dossier où l'on se trouve
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 //enregistrement des routes
-app.use("/api/messages", messageRoutes); // L'application utilise le endpoint /api/messages pour les routes messageRoutes
-app.use("/api/comments", commentRoutes); // L'application utilise le endpoint /api/comments pour les routes commentRoutes
-app.use("/api/auth", userRoutes); // L'application utilise le endpoint /api/auth pour les routes userRoutes
+app.use("/api/auth", authRoutes) //// L'application utilise le endpoint /api/auth pour la route authRoutes
+app.use("/api/users", auth, userRoutes) // L'application utilise le endpoint /api/users pour la route  userRoutes
+app.use("/api/messages", auth, messageRoutes) // L'application utilise le endpoint /api/messages pour la route  messageRoutes
+app.use("/api/comments", auth, commentRoutes) // L'application utilise le endpoint /api/comments pour la route  commentRoutes
 
 //exporter cette application pour y accéder depuis les autres fichiers notamment le serveur
-module.exports = app;
+module.exports = app
