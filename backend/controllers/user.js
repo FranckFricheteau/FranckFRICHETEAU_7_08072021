@@ -1,36 +1,58 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const Users = require('../models/user');
+const Users = require('../models/user')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 // Inscription pour enregistrer des nouveaux utilisateurs
 exports.signup = (req, res, next) => {
-    bcrypt.hash(req.body.password, 10) // On appelle la fonction de hachage, on créer un nouvel utilisateur, on le sauvegarde dans la BDD
+    bcrypt.hash(req.body.password, 10)
+        .then(hash => {
+            const user = {
+                id: 1,
+                pseudo: req.body.pseudo,
+                email: req.body.email,
+                password: hash,
+                // profilPic: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+                isAdmin: 1,
+                isActive: 1
+            };
+            console.log(user);
+
+            user.save()
+
+        })
+
+
+    bcrypt.hash(req.body.password, 10)
         .then(hash => {
             const user = {
                 pseudo: req.body.pseudo,
                 email: req.body.email,
                 password: hash,
-                isActive: true,
-                isAdmin: 0
+                isAdmin: 0,
+                isActive: 1
             };
             console.log(user);
-            Users.create(user)
-                .then(() => res.status(201).json({ message: 'Utilisateur créé !' })) // Création utilisateur, requête réussie et ressource créée code 201 OK
-                .catch(error => res.status(400).send('Utilisateur déjà existant !')); // Erreur 400 Utilisateur déjà existant
+
+            user.save()
+                .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
+                .catch(error => res.status(401).json({ error }))
         })
-        .catch(error => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
+
+    .catch(error => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
 };
 
 // Connexion
 // controller de connexion à un compte existant
 exports.login = (req, res, next) => {
-    Users.findOne({ email: req.body.email }, (err, result) => {
+    Users.findOne(req.body.email, (err, result) => {
         if (err) {
             return res.status(400).json({ message: 'Utilisateur non trouvé' });
         }
-
-        if (!result.isActive) {
-            return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
+        if (user.isActive === 0) {
+            return res.status(403).json({ error: "Utilisateur supprimé !" })
+        }
+        if (!user) {
+            return res.status(404).json({ error: "Utilisateur non trouvé !" })
         }
         bcrypt.compare(req.body.password, result.password)
             .then(valid => {
@@ -65,7 +87,7 @@ exports.login = (req, res, next) => {
 
 // Récupérer tous les utilisateurs
 exports.getAllUsers = (req, res, next) => {
-    Users.findAll((err, result) => {
+    User.findAll((err, result) => {
         if (err) {
             return res.status(404).send({ message: 'Utilisateurs non trouvés' });
         } else {
@@ -77,7 +99,7 @@ exports.getAllUsers = (req, res, next) => {
 // Réupérer un seul user
 exports.getOneUser = (req, res, next) => {
     let id = req.body.userId
-    Users.findOneById(id, (err, result) => {
+    User.findOneById(id, (err, result) => {
         if (err) {
             return res.status(404).send({ message: 'Utilisateur non trouvé' });
         } else {
@@ -97,7 +119,7 @@ exports.updateOneUserPseudo = (req, res, next) => {
         'id': req.params.id,
         'pseudo': req.body.pseudo,
     }
-    Users.modifyPseudo(user, (err, result) => {
+    User.modifyPseudo(user, (err, result) => {
         if (err) {
             return res.status(400).send({ message: 'Modification non effectuée' });
         }
@@ -119,7 +141,7 @@ exports.updateOneUserFile = (req, res, next) => {
         'id': req.params.id,
         'profilPic': req.file ? req.file.filename : null,
     }
-    Users.modifyProfilPic(user, (err, result) => {
+    User.modifyProfilPic(user, (err, result) => {
         if (err) {
             return res.status(400).send({ message: 'BACK Modification non effectuée' });
         }
@@ -131,7 +153,7 @@ exports.updateOneUserFile = (req, res, next) => {
 
 // Supprimer un user
 exports.deactivateUser = (req, res, next) => {
-    Users.deactivate(req.params.id, (err, result) => {
+    User.deactivate(req.params.id, (err, result) => {
         if (err) {
             return res.status(400).send({ message: 'Impossible de supprimer l\'utilisateur' });
         }
