@@ -13,7 +13,7 @@ const rateLimit = require('express-rate-limit');
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes 
-    max: 30 // 15 essais max
+    max: 60 // 60 essais max
 });
 
 //Limiter les demandes répétées à l'API uniquement sur le login
