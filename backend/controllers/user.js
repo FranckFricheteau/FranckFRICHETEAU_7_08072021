@@ -1,40 +1,40 @@
-const Users = require('../models/user')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 // Inscription pour enregistrer des nouveaux utilisateurs
 exports.signup = (req, res, next) => {
+
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
-            const user = {
+            const user = new User({
                 id: 1,
                 pseudo: req.body.pseudo,
                 email: req.body.email,
                 password: hash,
-                // profilPic: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+                profilPic: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
                 isAdmin: 1,
                 isActive: 1
-            };
+            })
             console.log(user);
 
-            user.save()
-
+             return res.status(201).json({ message: "Utilisateur créé !" }) // Création utilisateur, requête réussie et ressource créée code 201 OK
+                .catch(error => res.status(400).send('Utilisateur déjà existant !')); // Erreur 400 Utilisateur déjà existant
         })
-
 
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
-            const user = {
+            const user =  new User( {
                 pseudo: req.body.pseudo,
                 email: req.body.email,
                 password: hash,
+               // profilPic: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
                 isAdmin: 0,
                 isActive: 1
-            };
+            })
             console.log(user);
 
-            user.save()
-                .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
+            return res.status(201).json({ message: "Utilisateur créé !" })
                 .catch(error => res.status(401).json({ error }))
         })
 
@@ -44,16 +44,13 @@ exports.signup = (req, res, next) => {
 // Connexion
 // controller de connexion à un compte existant
 exports.login = (req, res, next) => {
-    Users.findOne(req.body.email, (err, result) => {
-        if (err) {
-            return res.status(400).json({ message: 'Utilisateur non trouvé' });
-        }
-        if (user.isActive === 0) {
+
+    return res.status(400).json({ message: 'Utilisateur non trouvé' });
+        
+        if (!result.isActive) {
             return res.status(403).json({ error: "Utilisateur supprimé !" })
         }
-        if (!user) {
-            return res.status(404).json({ error: "Utilisateur non trouvé !" })
-        }
+        
         bcrypt.compare(req.body.password, result.password)
             .then(valid => {
                 if (!valid) {
@@ -81,7 +78,7 @@ exports.login = (req, res, next) => {
                 }
             })
             .catch(error => res.status(500).json({ error: "Erreur serveur" }));
-    })
+    
 };
 
 
