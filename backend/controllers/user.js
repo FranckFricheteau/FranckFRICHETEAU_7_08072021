@@ -12,15 +12,15 @@ exports.signup = (req, res, next) => {
                 pseudo: req.body.pseudo,
                 email: req.body.email,
                 password: hash,
-                profilPic: `${req.protocol}://${req.get('host')}/images/profile_admin.png`,
+                profilPic: `${req.protocol}://${req.get('host')}/images/FranckF5683.jpg`,
                 isAdmin: 1,
                 isActive: 1
-            })
+            });
             console.log(user);
 
-            res.status(201).json({ message: "Utilisateur créé avec succès !" })
-            return res.status(400).json({ message: 'utilisateur déjà existant !' })
-
+            user.save()
+                .then(() => res.status(201).json({ message: 'Utilisateur créé !' })) // Création utilisateur, requête réussie et ressource créée code 201 OK
+                .catch(error => res.status(400).send('Utilisateur déjà existant !')); // Erreur 400 Utilisateur déjà existant
         })
 
     bcrypt.hash(req.body.password, 10)
@@ -32,11 +32,12 @@ exports.signup = (req, res, next) => {
                 profilPic: `${req.protocol}://${req.get('host')}/images/profile_utilisator.png`,
                 isAdmin: 0,
                 isActive: 1
-            })
+            });
             console.log(user);
 
-            res.status(201).json({ message: "Utilisateur créé avec succès !" })
-            return res.status(400).json({ message: 'utilisateur déjà existant !' })
+            user.save()
+                .then(() => res.status(201).json({ message: 'Utilisateur créé !' })) // Création utilisateur, requête réussie et ressource créée code 201 OK
+                .catch(error => res.status(400).send('Utilisateur déjà existant !')); // Erreur 400 Utilisateur déjà existant
         })
 
     .catch(error => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
@@ -46,7 +47,7 @@ exports.signup = (req, res, next) => {
 // controller de connexion à un compte existant
 // Connexion
 exports.login = (req, res, next) => {
-    User.findOneByEmail(req.body.email, (err, result) => {
+    User.findOneByEmail({ email: req.body.email }, (err, result) => {
         if (err) {
             return res.status(400).json({ message: 'Utilisateur non trouvé' });
         }
