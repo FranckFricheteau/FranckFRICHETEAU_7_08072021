@@ -46,41 +46,44 @@ exports.signup = (req, res, next) => {
 // controller de connexion à un compte existant
 // Connexion
 exports.login = (req, res, next) => {
+    User.findOneByEmail(req.body.email, (err, result) => {
+        if (err) {
+            return res.status(400).json({ message: 'Utilisateur non trouvé' });
+        }
 
-    res.status(400).json({ message: 'Utilisateur non trouvé' });
+        if (!result.isActive) {
+            return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
+        }
 
-    if (isActive === 0) {
-        return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
-    }
-
-    bcrypt.compare(req.body.password, result.password)
-        .then(valid => {
-            if (!valid) {
-                return res.status(401).json({ message: 'Mot de passe invalide' })
-            } else {
-                let payload = {
-                    'userId': result.id,
-                    'isAdmin': !!result.isAdmin
-                };
-                let profile = result.profilPic;
-                if (!result.profilPic) {
-                    profile = ''
+        bcrypt.compare(req.body.password, result.password)
+            .then(valid => {
+                if (!valid) {
+                    return res.status(401).json({ message: 'Mot de passe invalide' })
+                } else {
+                    let payload = {
+                        'userId': result.id,
+                        'isAdmin': !!result.isAdmin
+                    };
+                    let profile = result.profilPic;
+                    if (!result.profilPic) {
+                        profile = ''
+                    }
+                    res.status(200).json({
+                        pseudo: result.pseudo,
+                        userId: result.id,
+                        profilPic: profile,
+                        isAdmin: result.isAdmin,
+                        isActive: result.isActive,
+                        token: jwt.sign(
+                            payload, token,
+                            'RANDOM_TOKEN_SECRET', { expiresIn: '24h' }
+                        )
+                    })
                 }
-                res.status(200).json({
-                    pseudo: result.pseudo,
-                    userId: result.id,
-                    profilPic: profile,
-                    isAdmin: result.isAdmin,
-                    isActive: result.isActive,
-                    token: jwt.sign(
-                        payload, token,
-                        'RANDOM_TOKEN_SECRET', { expiresIn: '24h' }
-                    )
-                })
-            }
-        })
-        .catch(error => res.status(500).json({ error: "Erreur serveur" }));
+            })
+            .catch(error => res.status(500).json({ error: "Erreur serveur" }));
 
+    })
 };
 
 // Récupérer tous les utilisateurs
