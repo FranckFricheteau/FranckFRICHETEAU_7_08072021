@@ -29,7 +29,7 @@ const User = function(User) {
     };
 
     // Trouver un user via son email
-    User.findOne = (email, result) => {
+    User.findOnebyEmail = (email, result) => {
         let statment = 'SELECT * FROM users WHERE email=? AND isActive=true';
         db.query(statment, email, (err, res) => {
             if (err) {
@@ -101,7 +101,8 @@ const User = function(User) {
                 result(null, res)
             }
         })
-    };
+    }
+};
 
-}
-module.exports = User;
+
+module.exports = User
