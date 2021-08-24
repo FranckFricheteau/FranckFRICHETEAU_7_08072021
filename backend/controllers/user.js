@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/user').User;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -13,78 +13,68 @@ exports.signup = (req, res, next) => {
                 email: req.body.email,
                 password: hash,
                 profilPic: `${req.protocol}://${req.get('host')}/images/FranckF5683.jpg`,
-                isAdmin: 1,
-                isActive: 1
+                isAdmin: true,
+                isActive: true
             });
             console.log(user);
 
-            user.save()
-                .then(() => res.status(201).json({ message: 'Utilisateur créé !' })) // Création utilisateur, requête réussie et ressource créée code 201 OK
-                .catch(error => res.status(400).send('Utilisateur déjà existant !')); // Erreur 400 Utilisateur déjà existant
-        })
+            User.create(user, (err, data) => {
+                if (err) {
+                    return res.status(400).json({ message: 'Impossible de créer l\'utilisateur, déjà existant!' });
+                }
+                res.send(data);
+            })
 
-    bcrypt.hash(req.body.password, 10)
-        .then(hash => {
-            const user = new User({
-                pseudo: req.body.pseudo,
-                email: req.body.email,
-                password: hash,
-                profilPic: `${req.protocol}://${req.get('host')}/images/profile_utilisator.png`,
-                isAdmin: 0,
-                isActive: 1
-            });
-            console.log(user);
-
-            user.save()
-                .then(() => res.status(201).json({ message: 'Utilisateur créé !' })) // Création utilisateur, requête réussie et ressource créée code 201 OK
-                .catch(error => res.status(400).send('Utilisateur déjà existant !')); // Erreur 400 Utilisateur déjà existant
         })
 
     .catch(error => res.status(500).json({ error: 'le serveur a rencontré un problème inattendu empêchant de répondre à la requête' }));
+
 };
 
 // Connexion
 // controller de connexion à un compte existant
 // Connexion
 exports.login = (req, res, next) => {
-    User.findOneByEmail({ email: req.body.email }, (err, result) => {
-        if (err) {
-            return res.status(400).json({ message: 'Utilisateur non trouvé' });
-        }
 
-        if (!result.isActive) {
-            return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
-        }
+    User.findOnebyEmail({ email: req.body.email })
+        .then(user => {
+            if (!user) {
+                return res.status(400).send('Adresse mail inexistante !'); //Erreur adresse mail introuvable code 400
+            }
 
-        bcrypt.compare(req.body.password, result.password)
-            .then(valid => {
-                if (!valid) {
-                    return res.status(401).json({ message: 'Mot de passe invalide' })
-                } else {
-                    let payload = {
-                        'userId': result.id,
-                        'isAdmin': !!result.isAdmin
-                    };
-                    let profile = result.profilPic;
-                    if (!result.profilPic) {
-                        profile = ''
+            if (!result.isActive) {
+                return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
+            }
+
+            bcrypt.compare(req.body.password, result.password)
+                .then(valid => {
+                    if (!valid) {
+                        return res.status(401).json({ message: 'Mot de passe invalide' })
+                    } else {
+                        let payload = {
+                            'userId': result.id,
+                            'isAdmin': !!result.isAdmin
+                        };
+                        let profile = result.profilPic;
+                        if (!result.profilPic) {
+                            profile = ''
+                        }
+                        res.status(200).json({
+                            pseudo: result.pseudo,
+                            userId: result.id,
+                            profilPic: profile,
+                            isAdmin: result.isAdmin,
+                            isActive: result.isActive,
+                            token: jwt.sign(
+                                payload, token,
+                                'RANDOM_TOKEN_SECRET', { expiresIn: '24h' }
+                            )
+                        })
                     }
-                    res.status(200).json({
-                        pseudo: result.pseudo,
-                        userId: result.id,
-                        profilPic: profile,
-                        isAdmin: result.isAdmin,
-                        isActive: result.isActive,
-                        token: jwt.sign(
-                            payload, token,
-                            'RANDOM_TOKEN_SECRET', { expiresIn: '24h' }
-                        )
-                    })
-                }
-            })
-            .catch(error => res.status(500).json({ error: "Erreur serveur" }));
+                })
+                .catch(error => res.status(500).json({ error: "Erreur serveur" }));
 
-    })
+        })
 };
 
 // Récupérer tous les utilisateurs
