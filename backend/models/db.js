@@ -1,16 +1,20 @@
 //*********************************************
 // connection to mySQL
-var mysql = require('mysql');
-var connection = mysql.createConnection({
+const mysql = require('mysql');
+const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'Azerty123,',
-    database: 'groupomania',
+    database: 'groupomania'
 });
 
-connection.connect(function(error) {
-    if (error) {
+// Connection 
+db.connect((err) => {
+    if (err) {
         console.log("connection to MySQL failed");
-        throw error
-    } else { console.log('All is under controle =) connection to MySQL success ! '); }
+        throw err;
+    }
+    console.log('All is under controle =) connection to MySQL success !');
 });
+
+module.exports = db;
