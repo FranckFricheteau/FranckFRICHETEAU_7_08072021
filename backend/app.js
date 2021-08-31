@@ -1,11 +1,7 @@
-const express = require('express');
-const app = express();
-const path = require("path")
-const bodyParser = require('body-parser');
-const auth = require("./middleware/auth")
-
-// recuperation de Helmet (sécurise les appli Express en définissant divers en-têtes HTTPP, protège contre les failles XSS//
-const helmet = require('helmet');
+const express = require('express'); // Importation du framework : création et gestion du serveur
+const bodyParser = require('body-parser'); // Importation du package body-parser : extraction des objets JSON
+const path = require('path'); // Importation du package mongoose-path :
+const helmet = require('helmet'); // Importation du package helmet :
 const cors = require('cors');
 
 //Rate Limit - Middleware de base à limitation de débit pour Express
@@ -16,15 +12,14 @@ const apiLimiter = rateLimit({
     max: 60 // 60 essais max
 });
 
-//Limiter les demandes répétées à l'API uniquement sur le login
-app.use("/api/auth/login", apiLimiter);
-
-
 //import des routeurs dans l'application
-const authRoutes = require("./routes/auth") // Importation de la route auth
-const userRoutes = require("./routes/user") // Importation de la route user
 const messageRoutes = require("./routes/messages") // Importation de la route messages
 const commentRoutes = require("./routes/comments") // Importation de la route comments
+const authRoutes = require("./routes/auth") // Importation de la route auth
+const userRoutes = require("./routes/user") // Importation de la route user
+
+
+const app = express(); // Application
 
 
 //DB connection//
@@ -38,26 +33,19 @@ app.use((req, res, next) => {
     next();
 });
 
-/* .json - méthode de l'objet bodyParser qui transforme le corps de la requête en objet JS*/
-app.use(bodyParser.json());
-
-//Installation d'helmet, entête HTTP helmet
-app.use(helmet());
-//Installation de CORS - Utilisation de CORS
+//Limiter les demandes répétées à l'API uniquement sur le login
+app.use("/api/auth/login", apiLimiter);
+app.use(bodyParser.json()); // Définition de la fonction json comme middleware global
+app.use(bodyParser.urlencoded({ extended: true })); // content-type: application/x-www-form-urlencoded
 app.use(cors());
-
-//Installation d'express - Utiliser l'application Express
-app.use(express.json());
-
-//gestionnaire de routage pour les images
-//__dirname: le dossier où l'on se trouve
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, 'images'))); // Gestion de la source de manière statique grâce à Express
+app.use(helmet());
 
 //enregistrement des routes
 app.use("/api/auth", authRoutes) //// L'application utilise le endpoint /api/auth pour la route authRoutes
-app.use("/api/users", auth, userRoutes) // L'application utilise le endpoint /api/users pour la route  userRoutes
-app.use("/api/messages", auth, messageRoutes) // L'application utilise le endpoint /api/messages pour la route  messageRoutes
-app.use("/api/comments", auth, commentRoutes) // L'application utilise le endpoint /api/comments pour la route  commentRoutes
+app.use("/api/users", userRoutes) // L'application utilise le endpoint /api/users pour la route  userRoutes
+app.use("/api/messages", messageRoutes) // L'application utilise le endpoint /api/messages pour la route  messageRoutes
+app.use("/api/comments", commentRoutes) // L'application utilise le endpoint /api/comments pour la route  commentRoutes
 
 //exporter cette application pour y accéder depuis les autres fichiers notamment le serveur
 module.exports = app
