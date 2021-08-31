@@ -15,7 +15,6 @@ const apiLimiter = rateLimit({
 //import des routeurs dans l'application
 const messageRoutes = require("./routes/messages") // Importation de la route messages
 const commentRoutes = require("./routes/comments") // Importation de la route comments
-const authRoutes = require("./routes/auth") // Importation de la route auth
 const userRoutes = require("./routes/user") // Importation de la route user
 
 
@@ -42,10 +41,10 @@ app.use('/images', express.static(path.join(__dirname, 'images'))); // Gestion d
 app.use(helmet());
 
 //enregistrement des routes
-app.use("/api/auth", authRoutes) //// L'application utilise le endpoint /api/auth pour la route authRoutes
-app.use("/api/users", userRoutes) // L'application utilise le endpoint /api/users pour la route  userRoutes
 app.use("/api/messages", messageRoutes) // L'application utilise le endpoint /api/messages pour la route  messageRoutes
 app.use("/api/comments", commentRoutes) // L'application utilise le endpoint /api/comments pour la route  commentRoutes
+app.use("/api/auth", userRoutes) //// L'application utilise le endpoint /api/auth pour la route authRoutes
+
 
 //exporter cette application pour y accéder depuis les autres fichiers notamment le serveur
 module.exports = app
