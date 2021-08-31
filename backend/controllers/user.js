@@ -1,6 +1,8 @@
-const User = require('../models/user').User;
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt'); // Importation du package de chiffrement bcrytp
+const jwt = require('jsonwebtoken'); // Importation du package jsonwebtoken
+const User = require('../models/user'); // Importation modèle User
+const fs = require('fs'); // 
+const Utils = require('../libs/utils.js');
 
 // Inscription pour enregistrer des nouveaux utilisateurs
 exports.signup = (req, res, next) => {
@@ -13,7 +15,7 @@ exports.signup = (req, res, next) => {
                 email: req.body.email,
                 password: hash,
                 profilPic: `${req.protocol}://${req.get('host')}/images/FranckF5683.jpg`,
-                isAdmin: true,
+                isAdmin: false,
                 isActive: true
             });
             console.log(user);
@@ -32,49 +34,44 @@ exports.signup = (req, res, next) => {
 };
 
 // Connexion
-// controller de connexion à un compte existant
-// Connexion
 exports.login = (req, res, next) => {
+    User.findOneByEmail(req.body.email, (err, result) => {
+        if (err) {
+            return res.status(400).json({ message: 'Utilisateur non trouvé' });
+        }
 
-    User.findOnebyEmail({ email: req.body.email })
-        .then(user => {
-            if (!user) {
-                return res.status(400).send('Adresse mail inexistante !'); //Erreur adresse mail introuvable code 400
-            }
+        if (!result.isActive) {
+            return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
+        }
 
-            if (!result.isActive) {
-                return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
-            }
-
-            bcrypt.compare(req.body.password, result.password)
-                .then(valid => {
-                    if (!valid) {
-                        return res.status(401).json({ message: 'Mot de passe invalide' })
-                    } else {
-                        let payload = {
-                            'userId': result.id,
-                            'isAdmin': !!result.isAdmin
-                        };
-                        let profile = result.profilPic;
-                        if (!result.profilPic) {
-                            profile = ''
-                        }
-                        res.status(200).json({
-                            pseudo: result.pseudo,
-                            userId: result.id,
-                            profilPic: profile,
-                            isAdmin: result.isAdmin,
-                            isActive: result.isActive,
-                            token: jwt.sign(
-                                payload, token,
-                                'RANDOM_TOKEN_SECRET', { expiresIn: '24h' }
-                            )
-                        })
+        bcrypt.compare(req.body.password, result.password)
+            .then(valid => {
+                if (!valid) {
+                    return res.status(401).json({ message: 'Mot de passe invalide' })
+                } else {
+                    let payload = {
+                        'userId': result.id,
+                        'isAdmin': !!result.isAdmin
+                    };
+                    let profile = result.profilPic;
+                    if (!result.profilPic) {
+                        profile = ''
                     }
-                })
-                .catch(error => res.status(500).json({ error: "Erreur serveur" }));
-
-        })
+                    res.status(200).json({
+                        pseudo: result.pseudo,
+                        userId: result.id,
+                        profilPic: profile,
+                        isAdmin: result.isAdmin,
+                        isActive: result.isActive,
+                        token: jwt.sign(
+                            payload,
+                            'RANDOM_TOKEN_SECRET', { expiresIn: '24h' }
+                        )
+                    })
+                }
+            })
+            .catch(error => res.status(500).json({ error: "Erreur serveur" }));
+    })
 };
 
 // Récupérer tous les utilisateurs
