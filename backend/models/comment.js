@@ -1,6 +1,6 @@
 // Création du modèle comment
 const db = require('./db');
-const Utils = require('../libs/utils.js');
+const Utils = require('../libs/utils');
 
 const Comment = function(comment) {
     this.user_id = comment.user_id,
@@ -37,7 +37,7 @@ Comment.latest = (result) => {
 
 //récupérer tous les commentaires utilisateurs par message
 Comment.findAllMessageComment = (id, result) => {
-    let statment = 'SELECT * comments WHERE message.id=?';
+    let statment = 'SELECT * FROM comments WHERE message_id=?';
     db.query(statment, id, (err, res) => {
         if (err) {
             result(err, null);
@@ -49,7 +49,7 @@ Comment.findAllMessageComment = (id, result) => {
 
 //supprimer un commentaire
 Comment.delete = (id, result) => {
-    let statment = 'SELECT * comments WHERE message.id=?';
+    let statment = 'DELETE FROM comments WHERE id=?';
     db.query(statment, id, (err, res) => {
         if (err) {
             result(err, null);
@@ -58,5 +58,4 @@ Comment.delete = (id, result) => {
         return (null, res)
     })
 };
-
 module.exports = Comment;
