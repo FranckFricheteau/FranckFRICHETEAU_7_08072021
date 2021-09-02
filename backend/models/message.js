@@ -76,7 +76,7 @@ Message.findAllWithComments = (result) => {
               comments.comment AS comment_content
               FROM messages 
               LEFT JOIN users ON messages.user_id = users.id
-              LEFT JOIN comments ON messages.id  = comments.message.id              
+              LEFT JOIN comments ON messages.id  = comments.message_id              
               LEFT JOIN users AS user_comment ON comments.user_id = user_comment.id
               WHERE messages.isActive=true 
               ORDER BY messages.id DESC;`,
@@ -123,7 +123,7 @@ Message.findReaction = (reaction, result) => {
         } else {
             result(null, res);
         }
-    });
+    })
 };
 
 //Trouver toutes les réactions
@@ -162,7 +162,6 @@ Message.updateReaction = (newReaction, result) => {
             result(null, res)
         }
     })
-
 
 };
 module.exports = Message;
