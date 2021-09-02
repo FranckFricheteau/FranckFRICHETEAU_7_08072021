@@ -1,5 +1,5 @@
 const Message = require('../models/message');
-const Utils = require('../libs/utils.js');
+const Utils = require('../libs/utils');
 const fs = require('fs');
 
 // Créer un message
@@ -10,7 +10,7 @@ exports.createMessage = (req, res, next) => {
         image: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null,
         createdAt: Utils.getSqlDate(),
         updatedAt: Utils.getSqlDate(),
-        isActive: true,
+        isActive: true
     });
 
     Message.create(newMessage, (err, data) => {
@@ -61,7 +61,7 @@ exports.getAllReactions = (req, res, next) => {
         if (err) {
             return res.status(400).json({ message: 'Impossible de récupérer les messages' });
         }
-        res.status(200).json(data)({ message: 'Les messages ont bien été récupérés!' });
+        res.status(200).json(data);
     });
 };
 
