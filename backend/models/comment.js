@@ -1,61 +1,73 @@
-// Création du modèle comment
+// Création des modèles Comment
 const db = require('./db');
-const Utils = require('../libs/utils');
+const Utils = require('../libs/utils.js');
 
 const Comment = function(comment) {
     this.user_id = comment.user_id,
-        this.message_id = message.user_id,
+        this.message_id = comment.message_id,
         this.comment = comment.comment,
         this.createdAt = comment.createdAt,
         this.updatedAt = comment.updatedAt
-
 }
 
-//créer un commentaire
+// Créer un comment
 Comment.create = (newComment, result) => {
-    let statment = 'INSERT INTO comments SET ?';
-    db.query(statment, newComment, (err, res) => {
-        if (err) {
-            result(err, null);
-            return;
-        }
-        return (null, res)
-    })
+    db.query(`INSERT 
+              INTO comments 
+              SET ?`,
+        newComment, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, res)
+        })
 };
 
-//récupérer le dernier commentaire de l'utilisateur
+// Récupérer le dernier commentaire
 Comment.latest = (result) => {
-    let statment = 'SELECT comments.*, users.pseudo as pseudo FROM comments JOIN users ON users.id=comments.users.id ORDER BY id DESC LIMIT 0,1';
-    db.query(statment, (err, res) => {
-        if (err) {
-            result(err, null);
-            return;
-        }
-        return (null, res[0])
-    })
+    db.query(`SELECT comments.*,
+              users.pseudo as pseudo
+              FROM comments
+              JOIN users ON users.id=comments.user_id
+              ORDER BY id
+              DESC LIMIT 0,1`,
+        (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, res[0])
+        })
 };
 
-//récupérer tous les commentaires utilisateurs par message
+// Récupérer les commentaires par message
 Comment.findAllMessageComment = (id, result) => {
-    let statment = 'SELECT * FROM comments WHERE message_id=?';
-    db.query(statment, id, (err, res) => {
-        if (err) {
-            result(err, null);
-            return;
-        }
-        return (null, res[0])
-    })
+    db.query(`SELECT * 
+              FROM comments 
+              WHERE message_id=?`,
+        id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            } else {
+                result(null, res[0])
+            }
+        })
 };
 
-//supprimer un commentaire
+// Supprimer un comment
 Comment.delete = (id, result) => {
-    let statment = 'DELETE FROM comments WHERE id=?';
-    db.query(statment, id, (err, res) => {
-        if (err) {
-            result(err, null);
-            return;
-        }
-        return (null, res)
-    })
+    db.query(`DELETE FROM comments 
+              WHERE id=?`,
+        Number(id), (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            } else {
+                result(null, res)
+            }
+        })
 };
+
 module.exports = Comment;
