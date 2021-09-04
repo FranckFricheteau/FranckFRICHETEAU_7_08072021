@@ -14,8 +14,8 @@ exports.signup = (req, res, next) => {
                 pseudo: req.body.pseudo,
                 email: req.body.email,
                 password: hash,
-                profilPic: `${req.protocol}://${req.get('host')}/images/FranckF5683.jpg`,
-                isAdmin: true,
+                profilPic: `profile_utilisator.png`,
+                isAdmin: false,
                 isActive: true
             });
             console.log(user);
