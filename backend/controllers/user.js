@@ -36,12 +36,9 @@ exports.signup = (req, res, next) => {
 // Connexion
 exports.login = (req, res, next) => {
     User.findOneByEmail(req.body.email, (err, result) => {
-        if (err) {
-            return res.status(400).json({ message: 'Utilisateur non trouvé' });
-        }
 
-        if (!result.isActive) {
-            return res.status(400).json({ message: 'Utlisateur trouvé mais désactivé' });
+        if (!result) {
+            return res.status(400).json({ message: 'Utilisateur non trouvé ou désactivé' })
         }
 
         bcrypt.compare(req.body.password, result.password)
