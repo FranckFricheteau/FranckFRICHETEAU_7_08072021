@@ -3,14 +3,14 @@
     <nav class="flex items-center justify-between flex-wrap p-6">
       <div class="flex items-center flex-no-shrink text-white mr-6">
         <a href="http://localhost:8080/welcome"> <!--Bienvenue sur le port 8080 en local -->
-         <h1 class="ml1">
+        <!-- <h1 class="ml1">
   <span class="text-wrapper">
     <span class="line line1"></span>
     <span class="letters">GROUPOMANIA</span>
     <span class="line line2"></span>
   </span>
-</h1>
-          <img width="158" height="78" src="../assets/icon.svg" alt="groupomania-logo"/>
+</h1>-->
+          <img width="158" height="78" src="../assets/groupomania_logo.png" alt="groupomania-logo"/>
         </a>
      
       </div>
