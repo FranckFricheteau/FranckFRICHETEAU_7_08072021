@@ -39,7 +39,7 @@
                   type="email"
                   placeholder="xxx@yyy.zzz"
                   aria-label="Écrire mon mot de passe"
-                  v-model="email"/>
+                  v-model="email" r/>
               </div>
               <div class="mb-4 md:flex md:justify-between">
                 <div class="mb-4 md:mr-2 md:mb-0">
@@ -131,7 +131,10 @@ export default {
   },
   computed: {
     isValid() {
-      if (this.pseudo.length < 3) {
+      if (this.pseudo.length < 6) {
+        return false
+      }
+      if (this.email.length < 6) {
         return false
       }
       if (this.password != this.confirm_password) {
@@ -143,8 +146,12 @@ export default {
   methods: {
     signUp() {
 
-       if (this.pseudo.length < 3) {
+       if (this.pseudo.length < 6) {
           alert('Votre pseudo est trop court');
+        return false;
+      }
+      if (this.email.length < 6) {
+          alert('Votre email est trop court');
         return false;
       }
       if (this.password != this.confirm_password) {
