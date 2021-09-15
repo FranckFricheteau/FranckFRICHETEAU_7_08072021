@@ -7,6 +7,7 @@ const Utils = require('../libs/utils.js');
 // Inscription pour enregistrer des nouveaux utilisateurs
 exports.signup = (req, res, next) => {
 
+
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
             const user = new User({
@@ -107,7 +108,7 @@ exports.updateOneUserPseudo = (req, res, next) => {
     }
     User.modifyPseudo(user, (err, result) => {
         if (err) {
-            return res.status(400).json({ message: 'Modification non effectuée' });
+            return res.status(400).json({ message: 'Modification non effectuée, pseudo déjà utilisé!' });
         }
         res.status(201).json({
             pseudo: result.pseudo
