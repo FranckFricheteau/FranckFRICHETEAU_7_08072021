@@ -131,7 +131,7 @@ export default {
   },
   computed: {
     isValid() {
-      if (this.pseudo.length < 6) {
+      if (this.pseudo.length < 3) {
         return false
       }
       if (this.email.length < 6) {
@@ -146,7 +146,7 @@ export default {
   methods: {
     signUp() {
 
-       if (this.pseudo.length < 6) {
+       if (this.pseudo.length < 3) {
           alert('Votre pseudo est trop court');
         return false;
       }
