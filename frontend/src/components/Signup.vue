@@ -166,12 +166,12 @@ export default {
       http
         .post('/auth/signup', payload)
         .then(res => {
-          alert('Inscription réussie !')
+          alert('Inscription réussie, vous allez être redirigé par la page de connexion !')
           window.location.href='/'
         })
         .catch(() => {
           console.log("Échec de l'inscription")
-          alert('Utilisateur déjà inscrit !')
+          alert('Utilisateur déjà inscrit ou mot de passe trop simple !')
 
       })
     }
