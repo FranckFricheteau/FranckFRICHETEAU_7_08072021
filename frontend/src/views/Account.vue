@@ -110,6 +110,8 @@ export default {
         this.updatePseudo(this.newPseudo)
       })
       .catch(() => console.log('Mise à jour impossible'));
+      alert('Pseudo déjà pris !')
+
     },
     uploadImage(e) {
       this.file = e.target.files[0];
