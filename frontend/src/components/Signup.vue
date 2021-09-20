@@ -166,7 +166,7 @@ export default {
       http
         .post('/auth/signup', payload)
         .then(res => {
-          alert('Inscription réussie, vous allez être redirigé par la page de connexion !')
+          alert('Inscription réussie, vous allez être redirigé vers la page de connexion !')
           window.location.href='/'
         })
         .catch(() => {
