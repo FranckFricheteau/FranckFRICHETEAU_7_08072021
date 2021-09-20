@@ -108,6 +108,8 @@ export default {
       .put('/auth/profile/' + this.user.id, payload)
       .then((res) => {
         this.updatePseudo(this.newPseudo)
+        alert('Le pseudo a bien été modifié !')
+
       })
       .catch(() => console.log('Mise à jour impossible'));
       alert('Pseudo déjà pris !')
