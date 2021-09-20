@@ -39,7 +39,7 @@
                   type="email"
                   placeholder="xxx@yyy.zzz"
                   aria-label="Écrire mon mot de passe"
-                  v-model="email" r/>
+                  v-model="email">
               </div>
               <div class="mb-4 md:flex md:justify-between">
                 <div class="mb-4 md:mr-2 md:mb-0">
@@ -151,7 +151,7 @@ export default {
         return false;
       }
       if (this.email.length < 6) {
-          alert('Votre email est trop court');
+          alert('Veuillez entrer une adresse mail correcte');
         return false;
       }
       if (this.password != this.confirm_password) {
@@ -171,6 +171,8 @@ export default {
         })
         .catch(() => {
           console.log("Échec de l'inscription")
+          alert('Utilisateur déjà inscrit !')
+
       })
     }
   }
